@@ -24,8 +24,8 @@ print(u)
 print(y)
 # Tentukan order model ARX
 
-n = 2  # order AR
-m = 1  # order X
+n = 4  # order AR
+m = 0  # order X
 
 # Buat matriks regresi Phi
 N = len(y)
@@ -88,10 +88,10 @@ print(a, b)
 
         
 for t in range(n, len(y_actual)):
+
     #measure a value
     for a_counter in range(0,n):
-        a_pred_val = (-a_measured[a_counter] * y_actual[t]) + a_pred_val
-        
+        a_pred_val = (-a_measured[a_counter] * y_actual[t-1]) + a_pred_val
         
     
     #measure b value
@@ -106,6 +106,7 @@ for t in range(n, len(y_actual)):
     #emptying buffer
     a_pred_val = 0
     b_pred_val = 0
+    
     
 
     
@@ -124,29 +125,26 @@ print("Mean Squared Error (MSE):", mse)
 
 
 
-
-
 # Membuat subplot (2 baris, 2 kolom)
 plt.subplot(2, 2, 1)  # Subplot pertama di kiri atas
-plt.plot(u, label='u', color='blue')  # Plot u
-plt.plot(y, label='y', color='red')  # Plot u
-plt.title('Plot of u')  # Judul subplot pertama
+plt.plot(u, label='input', color='blue')  # Plot u
+plt.title('grafik input')  # Judul subplot pertama
 plt.legend()  # Menambahkan legenda
 
 plt.subplot(2, 2, 2)  # Subplot kedua di kanan atas
-plt.plot(y, label='y act', color='red')  # Plot y
-plt.plot(y_pred, label='y pred', color='blue')  # Plot y
-plt.title('Plot of y')  # Judul subplot kedua
+plt.plot(y, label='y act', color='red',linestyle='dashed')  # Plot y
+plt.plot(y_pred, label='y pred', color='blue',linestyle='dashed')  # Plot y
+plt.title('grafik output prediksi dan aktual')  # Judul subplot kedua
 plt.legend()  # Menambahkan legenda
 
 plt.subplot(2, 2, 3)  # Subplot ketiga di kiri bawah
-plt.plot(u, label='u', color='green')  # Plot u
-plt.title('Plot of u')  # Judul subplot ketiga
+plt.plot(y, label='output', color='red')  # Plot u
+plt.title('grafik output')  # Judul subplot ketiga
 plt.legend()  # Menambahkan legenda
 
 plt.subplot(2, 2, 4)  # Subplot keempat di kanan bawah
-plt.plot(y, label='y', color='orange')  # Plot y
-plt.title('Plot of y')  # Judul subplot keempat
+plt.plot(error, label='e', color='orange')  # Plot y
+plt.title('error estimasi')  # Judul subplot keempat
 plt.legend()  # Menambahkan legenda
 
 plt.suptitle('System Identification of a DC Motor Using ARX Model', fontsize=13, fontweight='bold')
