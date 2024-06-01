@@ -24,7 +24,7 @@ print(u)
 print(y)
 # Tentukan order model ARX
 
-n = 4  # order AR
+n = 2  # order AR
 m = 0  # order X
 
 # Buat matriks regresi Phi
@@ -127,13 +127,13 @@ print("Mean Squared Error (MSE):", mse)
 
 # Membuat subplot (2 baris, 2 kolom)
 plt.subplot(2, 2, 1)  # Subplot pertama di kiri atas
-plt.plot(u, label='input', color='blue')  # Plot u
+plt.plot(u, label='input', color='#028391')  # Plot u
 plt.title('grafik input')  # Judul subplot pertama
 plt.legend()  # Menambahkan legenda
 
 plt.subplot(2, 2, 2)  # Subplot kedua di kanan atas
-plt.plot(y, label='y act', color='red',linestyle='dashed')  # Plot y
-plt.plot(y_pred, label='y pred', color='blue',linestyle='dashed')  # Plot y
+plt.plot(y, label='y act', color='blue',linestyle='dashed')  # Plot y
+plt.plot(y_pred, label='y pred', color='#00ff00',linestyle='dashed')  # Plot y
 plt.title('grafik output prediksi dan aktual')  # Judul subplot kedua
 plt.legend()  # Menambahkan legenda
 
