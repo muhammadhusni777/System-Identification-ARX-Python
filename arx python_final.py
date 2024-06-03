@@ -10,52 +10,63 @@ NIM : 23223303
 Teknik Kendali dan Sistem Cerdas STEI ITB
 
 '''
+
+print("==================== PROGRAM START ==============================")
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('data_dummy.csv')
+
+df = pd.read_csv('data_uji.csv')
+dv = pd.read_csv('data_validasi.csv')
 
 
 u = df.iloc[:, 0].to_numpy() 
 y = df.iloc[:, 1].to_numpy()
 
+u_validasi = dv.iloc[:, 0].to_numpy()
+y_validasi = dv.iloc[:, 1].to_numpy() 
+
+
+print("input matrices :")
 print(u)
+print("output matrices :")
 print(y)
-# Tentukan order model ARX
 
-n = 2  # order AR
-m = 0  # order X
 
-# Buat matriks regresi Phi
+n = 3  # order AR
+m = 2  # order X
+
 N = len(y)
 Phi = np.zeros((N-n, n+m))
 
-for i in range(n, N):
-    Phi[i-n, :n] = -y[i-n:i][::-1]  # bagian AR
-    Phi[i-n, n:] = u[i-m:i][::-1]   # bagian X
+############################################################
 
-# Vektor output
+for i in range(n, N):
+    Phi[i-n, :n] = -y[i-n:i][::-1]  
+    Phi[i-n, n:] = u[i-m:i][::-1]   
+
 Y = y[n:]
 
-# Cetak matriks Phi dan Y untuk verifikasi
-print("Matriks Phi:")
+
+print("Phi matrices:")
 print(Phi)
 
-print("Vektor Y:")
+print("Y vectors:")
 print(Y)
 
-# Estimasi parameter
+
 Theta = np.linalg.inv(np.dot(Phi.T,Phi)) @ np.dot(Phi.T, Y)
 
-# Pisahkan parameter menjadi a dan b
-print("Theta")
+
+print("Theta matrices :")
 print(Theta)
 a = Theta[:n]
 b = Theta[n:]
 
-print("Parameter a:", a)
-print("Parameter b:", b)
+print("estimated a constanta:", a)
+print("estimated b constanta:", b)
 
 
 ###############################################################################
@@ -64,89 +75,133 @@ a_pred_val = 0
 b_pred_val = 0
 
 
-# Data input (u) dan output (y) yang telah digunakan sebelumnya
+
 u = df.iloc[:, 0].to_numpy() 
 y_actual = df.iloc[:, 1].to_numpy()
 
-# Parameter yang telah diestimasi
+
 a_measured=a
 b_measured=b
 
-# Tentukan order model ARX
-n = len(a)  # order AR
-m = len(b)  # order X
 
-# Inisialisasi array untuk prediksi output
+n = len(a) 
+m = len(b) 
+
+
 y_pred = np.zeros(len(y_actual))
 
 
 
-# Hitung prediksi output menggunakan parameter yang diestimasi
-
-print("validation")
+print("prediction")
 print(a, b)
 
         
 for t in range(n, len(y_actual)):
 
-    #measure a value
+    
     for a_counter in range(0,n):
         a_pred_val = (-a_measured[a_counter] * y_actual[t-1]) + a_pred_val
         
     
-    #measure b value
+    
     for b_counter in range(0,m):
-        b_pred_val = (b_measured[b_counter] * y_actual[t-2]) + b_pred_val
+        b_pred_val = (b_measured[b_counter] * u[t-2]) + b_pred_val
         
-    #measure y prediction
+    
         
     y_pred[t] = a_pred_val + b_pred_val
-    #y_pred[t] = -a_measured[0] * y_actual[t-1] - a_measured[1] * y_actual[t-2] + b_measured[0] * u[t-1] + b_measured[1] * u[t-2]
     
     #emptying buffer
     a_pred_val = 0
     b_pred_val = 0
     
-    
 
-    
-        
-# Cetak prediksi dan output asli untuk verifikasi
-print("Output prediksi (y_pred):", y_pred[n:])
-print("Output asli (y_actual):", y_actual[n:])
+print("Output prediction (y_pred):", y_pred[n:])
+print("Output actual (y_actual):", y_actual[n:])
 
-# Hitung error prediksi
+
 error = y_actual[n:] - y_pred[n:]
-print("Error prediksi:", error)
+print("prediction Error :", error)
 
-# Hitung Mean Squared Error (MSE) sebagai ukuran kinerja model
+
 mse = np.mean(error**2)
+###############################################################
+
+print("validation")
+
+a_validation = 0
+b_validation = 0
+
+
+u_validation = dv.iloc[:, 0].to_numpy() 
+y_validation = dv.iloc[:, 1].to_numpy()
+print(len(y_validation))
+
+
+y_validation_pred = np.zeros(len(y_validation))
+
+
+for t in range(n, len(y_validation)):
+
+    
+    for a_counter in range(0,n):
+        a_pred_val = (-a_measured[a_counter] * y_validation[t-1]) + a_pred_val
+        
+    
+    
+    for b_counter in range(0,m):
+        b_pred_val = (b_measured[b_counter] * u_validation[t-2]) + b_pred_val
+        
+   
+        
+    y_validation_pred[t] = a_pred_val + b_pred_val
+    
+    
+    a_pred_val = 0
+    b_pred_val = 0
+
+
+print(y_validation_pred)  
+print(y_validation)   
+
+
 print("Mean Squared Error (MSE):", mse)
 
+error_validation = y_validation_pred[n:] - y_validation[n:]
+print("validation Error :", error_validation)
+
+mse_validation = np.mean(error_validation**2)
+print("Mean Squared Error (MSE) validation:", mse_validation)
+
+plt.subplot(2, 2, 1) 
+plt.plot(y, label='output', color='red') 
+plt.plot(u, label='input', color='#028391')  
+plt.title('grafik input output') 
+plt.legend()  
+
+plt.subplot(2, 2, 3) 
+plt.plot(y, label='y act', color='blue',linestyle='dashed')  
+plt.plot(y_pred, label='y pred', color='#00ff00',linestyle='dashed') 
+plt.title('grafik output prediksi dan aktual')  
+plt.legend()
+
+plt.subplot(2, 2, 4) 
+plt.plot(error, label='e prediksi', color='orange') 
+plt.plot(error_validation, label='e validasi', color='#007F73')  
+plt.title('error estimasi')  
+plt.legend() 
+
+plt.subplot(2, 2, 2)  
+plt.plot(y_validation, label='y actual', color='maroon')  
+plt.plot(y_validation_pred, label='y pred', color='#3AA6B9',linestyle='dashed')  
+plt.title('grafik validasi')  
+plt.legend()  
+
+fig = plt.gcf()
+fig.text(0.5, 0.01, str("a = ") + str(a)+ str("\n b = ") + str(b) + str("\n MSE = ") + str(mse) + str(" MSE Validation: ") + str(mse_validation), ha='center')
+plt.show() 
 
 
-# Membuat subplot (2 baris, 2 kolom)
-plt.subplot(2, 2, 1)  # Subplot pertama di kiri atas
-plt.plot(u, label='input', color='#028391')  # Plot u
-plt.title('grafik input')  # Judul subplot pertama
-plt.legend()  # Menambahkan legenda
+plt.suptitle('System Identification of a DC Motor Using ARX Model \n Muhammad Husni Muttaqin (23223303)', fontsize=13, fontweight='bold')
+plt.tight_layout(rect=[0, 0.05, 1, 0.95])
 
-plt.subplot(2, 2, 2)  # Subplot kedua di kanan atas
-plt.plot(y, label='y act', color='blue',linestyle='dashed')  # Plot y
-plt.plot(y_pred, label='y pred', color='#00ff00',linestyle='dashed')  # Plot y
-plt.title('grafik output prediksi dan aktual')  # Judul subplot kedua
-plt.legend()  # Menambahkan legenda
-
-plt.subplot(2, 2, 3)  # Subplot ketiga di kiri bawah
-plt.plot(y, label='output', color='red')  # Plot u
-plt.title('grafik output')  # Judul subplot ketiga
-plt.legend()  # Menambahkan legenda
-
-plt.subplot(2, 2, 4)  # Subplot keempat di kanan bawah
-plt.plot(error, label='e', color='orange')  # Plot y
-plt.title('error estimasi')  # Judul subplot keempat
-plt.legend()  # Menambahkan legenda
-
-plt.suptitle('System Identification of a DC Motor Using ARX Model', fontsize=13, fontweight='bold')
-plt.tight_layout()  # Mengatur tata letak subplot agar tidak tumpang tindih
-plt.show()  # Menampilkan kedua subplot
