@@ -35,8 +35,8 @@ print("output matrices :")
 print(y)
 
 
-n = 3  # order AR
-m = 2  # order X
+n = 2  # order AR
+m = 1  # order X
 
 N = len(y)
 Phi = np.zeros((N-n, n+m))
@@ -198,10 +198,12 @@ plt.title('grafik validasi')
 plt.legend()  
 
 fig = plt.gcf()
-fig.text(0.5, 0.01, str("a = ") + str(a)+ str("\n b = ") + str(b) + str("\n MSE = ") + str(mse) + str(" MSE Validation: ") + str(mse_validation), ha='center')
-plt.show() 
+fig.text(0.5, 0.01, str("a = ") + str(a)+ str(" b = ") + str(b) + str("\n MSE = ") + str(mse) + str(" MSE Validation: ") + str(mse_validation), ha='center')
+#
 
 
 plt.suptitle('System Identification of a DC Motor Using ARX Model \n Muhammad Husni Muttaqin (23223303)', fontsize=13, fontweight='bold')
-plt.tight_layout(rect=[0, 0.05, 1, 0.95])
+plt.tight_layout()
+
+plt.show() 
 
