@@ -36,7 +36,7 @@ print(y)
 
 
 n = 2  # order AR
-m = 1  # order X
+m = 0 # order X
 
 N = len(y)
 Phi = np.zeros((N-n, n+m))
